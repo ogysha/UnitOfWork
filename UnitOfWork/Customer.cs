@@ -1,6 +1,6 @@
 using System;
 
-namespace UnitOfWork.EF
+namespace UnitOfWork
 {
     public class Customer : IDomainEntity
     {

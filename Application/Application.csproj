@@ -1,7 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <None Remove="hibernate.config" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\UnitOfWork\UnitOfWork.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="hibernate.config" />
   </ItemGroup>
 
   <PropertyGroup>

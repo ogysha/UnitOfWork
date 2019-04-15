@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
-using UnitOfWork.EF;
+using UnitOfWork;
+using EF = UnitOfWork.EF;
+using NH = UnitOfWork.NH;
 
 namespace Application
 {
@@ -9,20 +11,36 @@ namespace Application
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("###Entity Framework###");
+            Console.WriteLine("###NHibernate###");
 
-            using (var context = new ECommerceContextFactory().CreateDbContext(args))
-            using (var uow = new UnitOfWork.EF.UnitOfWork(context))
+            using (NH.UnitOfWork uow = new NH.UnitOfWork())
             {
-                context.Database.Migrate();
-
-                var customerService = new CustomerService(uow, new Repository<Customer>(uow));
+                CustomerService customerServiceWithNH = new CustomerService(uow, new NH.Repository<Customer>(uow));
 
                 try
                 {
-                    CustomerDto customerDto = customerService.Add("EF First Name", Guid.NewGuid().ToString().Substring(0, 7));
+                    CustomerDto customerDto = customerServiceWithNH.Add("NH First Name", Guid.NewGuid().ToString().Substring(0, 7));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
 
-                    customerService.GetAll()
+            Console.WriteLine("###Entity Framework###");
+
+            using (var context = new EF.ECommerceContextFactory().CreateDbContext(args))
+            using (var uow = new EF.UnitOfWork(context))
+            {
+                context.Database.Migrate();
+
+                var customerServiceWithEF = new CustomerService(uow, new EF.Repository<Customer>(uow));
+
+                try
+                {
+                    CustomerDto customerDto = customerServiceWithEF.Add("EF First Name", Guid.NewGuid().ToString().Substring(0, 7));
+
+                    customerServiceWithEF.GetAll()
                         .ToList()
                         .ForEach(Console.WriteLine);
                 }
