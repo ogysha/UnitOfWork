@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using UnitOfWork.EF;
 
 namespace Application
@@ -11,8 +11,8 @@ namespace Application
         {
             Console.WriteLine("###Entity Framework###");
 
-            using(var context = new BloggingContextFactory().CreateDbContext(args))
-            using(var uow = new UnitOfWork.EF.UnitOfWork(context))
+            using (var context = new ECommerceContextFactory().CreateDbContext(args))
+            using (var uow = new UnitOfWork.EF.UnitOfWork(context))
             {
                 context.Database.Migrate();
 

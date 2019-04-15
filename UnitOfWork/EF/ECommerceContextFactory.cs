@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace UnitOfWork.EF
 {
-    public class BloggingContextFactory : IDesignTimeDbContextFactory<ECommerceContext>
+    public class ECommerceContextFactory : IDesignTimeDbContextFactory<ECommerceContext>
     {
         public ECommerceContext CreateDbContext(string[] args)
         {

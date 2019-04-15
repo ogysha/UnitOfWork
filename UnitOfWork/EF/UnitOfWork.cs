@@ -1,52 +1,55 @@
-﻿using System.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Data;
 
 namespace UnitOfWork.EF
 {
     public class UnitOfWork : IUnitOfWork
     {
         private IDbContextTransaction Transaction { get; set; }
-        public DbContext Context { get; }
+        public DbContext Context { get; private set; }
 
         public UnitOfWork(ECommerceContext context)
         {
-            Context = context;
+            this.Context = context;
         }
 
         public void OpenTransaction(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)
         {
-            if (Transaction == null) Transaction = Context.Database.BeginTransaction(isolationLevel);
+            if (this.Transaction == null)
+            {
+                this.Transaction = this.Context.Database.BeginTransaction(isolationLevel);
+            }
         }
 
         public void Commit()
         {
             try
             {
-                Context.SaveChanges();
-                Transaction.Commit();
+                this.Context.SaveChanges();
+                this.Transaction.Commit();
             }
             catch
             {
-                Transaction.Rollback();
+                this.Transaction.Rollback();
                 throw;
             }
         }
 
         public void Rollback()
         {
-            Transaction.Rollback();
+            this.Transaction.Rollback();
         }
 
         public void Dispose()
         {
-            if (Transaction != null)
+            if (this.Transaction != null)
             {
-                Transaction.Dispose();
-                Transaction = null;
+                this.Transaction.Dispose();
+                this.Transaction = null;
             }
 
-            Context.Dispose();
+            this.Context.Dispose();
         }
     }
 }
