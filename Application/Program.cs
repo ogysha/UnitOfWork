@@ -1,50 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using UnitOfWork;
-using System.IO;
+using Microsoft.EntityFrameworkCore;
 using UnitOfWork.EF;
 
 namespace Application
 {
-    class Program
+    public static class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            System.Console.WriteLine("###NHibernate###");
-            NHUnitOfWork uowNH = new NHUnitOfWork();
-            CustomerService customerServiceNH = new CustomerService(uowNH, new NHRepository<Customer>(uowNH));
-            
-            try
-            {
-                CustomerDto customerDto = customerServiceNH.Add("NH First Name", Guid.NewGuid().ToString().Substring(0, 7));
-            }
-            catch (Exception ex)
-            {
-                System.Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                uowNH.Dispose();
-            }
+            Console.WriteLine("###Entity Framework###");
 
+            using(var context = new BloggingContextFactory().CreateDbContext(args))
+            using(var uow = new UnitOfWork.EF.UnitOfWork(context))
+            {
+                context.Database.Migrate();
 
-            System.Console.WriteLine("###Entity Framework###");
-            EFUnitOfWork uowEF = new EFUnitOfWork();
-            CustomerService customerServiceEF = new CustomerService(uowEF, new EFRepository<Customer>(uowEF));
+                var customerService = new CustomerService(uow, new Repository<Customer>(uow));
 
-            try
-            {
-                CustomerDto customerDto = customerServiceEF.Add("EF First Name", Guid.NewGuid().ToString().Substring(0, 7));
-            }
-            catch (Exception ex)
-            {
-                System.Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                uowEF.Dispose();
+                try
+                {
+                    CustomerDto customerDto = customerService.Add("EF First Name", Guid.NewGuid().ToString().Substring(0, 7));
+
+                    customerService.GetAll()
+                        .ToList()
+                        .ForEach(Console.WriteLine);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
     }

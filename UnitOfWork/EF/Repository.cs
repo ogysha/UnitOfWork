@@ -5,12 +5,11 @@ using System.Text;
 
 namespace UnitOfWork.EF
 {
-    public class EFRepository<TEntity> : IRepoistory<TEntity>
-        where TEntity : class, IDomainEntity
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, IDomainEntity
     {
-        readonly EFUnitOfWork unitOfWork;
+        private readonly UnitOfWork unitOfWork;
 
-        public EFRepository(EFUnitOfWork unitOfWork)
+        public Repository(UnitOfWork unitOfWork)
         {
             this.unitOfWork = unitOfWork;
         }
