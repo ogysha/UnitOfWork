@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UnitOfWork
+namespace Infrastructure.Abstractions
 {
     public interface IUnitOfWork : IDisposable
     {

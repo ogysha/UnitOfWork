@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Linq;
-using UnitOfWork;
-using EF = UnitOfWork.EF;
-using NH = UnitOfWork.NH;
+using Infrastructure.Entities;
+using Infrastructure.Repositories.EF;
+using Infrastructure.Repositories.NPoco;
+using Microsoft.EntityFrameworkCore;
+using UnitOfWork = Infrastructure.Repositories.NPoco.UnitOfWork;
 
 namespace Application
 {
@@ -11,15 +12,22 @@ namespace Application
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("###NHibernate###");
+            Console.WriteLine("###NPoco###");
 
-            using (NH.UnitOfWork uow = new NH.UnitOfWork())
+            using (var db = ECommerceDbFactory.CreateDb())
+            using (var uow = new UnitOfWork(db))
             {
-                CustomerService customerServiceWithNH = new CustomerService(uow, new NH.Repository<Customer>(uow));
+                var customerServiceWithEf =
+                    new CustomerService(uow, new Infrastructure.Repositories.NPoco.BaseRepository<Customer>(uow));
 
                 try
                 {
-                    CustomerDto customerDto = customerServiceWithNH.Add("NH First Name", Guid.NewGuid().ToString().Substring(0, 7));
+                    var customerDto =
+                        customerServiceWithEf.Add("EF First Name", Guid.NewGuid().ToString().Substring(0, 7));
+
+                    customerServiceWithEf.GetAll()
+                        .ToList()
+                        .ForEach(Console.WriteLine);
                 }
                 catch (Exception ex)
                 {
@@ -29,18 +37,20 @@ namespace Application
 
             Console.WriteLine("###Entity Framework###");
 
-            using (var context = new EF.ECommerceContextFactory().CreateDbContext(args))
-            using (var uow = new EF.UnitOfWork(context))
+            using (var context = new ECommerceContextFactory().CreateDbContext(args))
+            using (var uow = new Infrastructure.Repositories.EF.UnitOfWork(context))
             {
                 context.Database.Migrate();
 
-                var customerServiceWithEF = new CustomerService(uow, new EF.Repository<Customer>(uow));
+                var customerServiceWithEf =
+                    new CustomerService(uow, new Infrastructure.Repositories.EF.BaseRepository<Customer>(uow));
 
                 try
                 {
-                    CustomerDto customerDto = customerServiceWithEF.Add("EF First Name", Guid.NewGuid().ToString().Substring(0, 7));
+                    var customerDto =
+                        customerServiceWithEf.Add("EF First Name", Guid.NewGuid().ToString().Substring(0, 7));
 
-                    customerServiceWithEF.GetAll()
+                    customerServiceWithEf.GetAll()
                         .ToList()
                         .ForEach(Console.WriteLine);
                 }

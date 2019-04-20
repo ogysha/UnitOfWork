@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace UnitOfWork.EF
+namespace Infrastructure.Repositories.EF
 {
     public class ECommerceContextFactory : IDesignTimeDbContextFactory<ECommerceContext>
     {

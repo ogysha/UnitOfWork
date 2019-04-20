@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Infrastructure.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-namespace UnitOfWork.EF
+namespace Infrastructure.Repositories.EF
 {
     public class ECommerceContext : DbContext
     {
@@ -15,9 +16,7 @@ namespace UnitOfWork.EF
         {
             // This will singularize all table names
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-            {
                 entityType.Relational().TableName = entityType.DisplayName();
-            }
         }
     }
 }
